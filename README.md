@@ -74,6 +74,38 @@ Follow the link for the [Docker installation](https://hub.docker.com/search?q=&t
 
 Instructions and download are available on the [Install MiniKube](https://kubernetes.io/docs/tasks/tools/install-minikube/) page.
 
+##### Mac users
+
+`minikube config set vm-driver hyperkit`
+
+`minikube config set kubernetes-version v1.13.0  --vm-driver="hyperkit"`
+
+##### Start version v1.13.0
+
+`minikube start --kubernetes-version v1.13.0 --vm-driver="hyperkit" --cpus 4 --memory 4096`
+
+##### MiniKube bootstrap (Helm, Prometheus, Grafana)
+
+`./minikube/bootstrap-minikube.sh`
+
+###### Verify installation
+
+- Verify nodes
+`kubectl describe nodes`
+- Pod resources
+`kubectl top pod`
+
+##### Deploy cluster script
+
+Deploy Akka cluster demo in local MiniKube
+
+`/minikube/cluster_api/deploy_cluster_api.sh`
+
+- This script will create local image of the project
+- Push image to local docker registry
+- Deploy configmaps and deployment object to MiniKube
+- Get services info to get access to the UI
+
 #### Install OpenShift MiniShift
 
 Instructions and download are availabel on the [Welcome to MiniShift](https://docs.okd.io/latest/minishift/index.html) page.

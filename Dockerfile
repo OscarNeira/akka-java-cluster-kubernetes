@@ -1,0 +1,13 @@
+FROM openjdk:8-jre-alpine
+ARG APPLICATION_ID=akka-cluster-demo
+ENV APPLICATION_ID $APPLICATION_ID
+ARG VERSION
+ENV APPLICATION_ID $APPLICATION_ID
+ENV APPLICATION_VERSION "${VERSION}"
+
+
+ADD build/distributions/${APPLICATION_ID}*.tar /opt/cluster/
+
+RUN mv /opt/cluster/${APPLICATION_ID}* /opt/cluster/${APPLICATION_ID}
+
+ENTRYPOINT ./opt/cluster/$APPLICATION_ID/bin/$APPLICATION_ID

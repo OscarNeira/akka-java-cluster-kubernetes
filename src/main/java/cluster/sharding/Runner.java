@@ -1,7 +1,11 @@
 package cluster.sharding;
 
 import akka.Done;
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.CoordinatedShutdown;
+import akka.actor.PoisonPill;
+import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.Member;
 import akka.cluster.sharding.ClusterSharding;
@@ -19,7 +23,7 @@ public class Runner {
     }
 
     private static void startupClusterNode() {
-        ActorSystem actorSystem = ActorSystem.create("akka-cluster-openshift");
+        ActorSystem actorSystem = ActorSystem.create("akka-cluster-demo");
 
         startClusterBootstrap(actorSystem);
 
