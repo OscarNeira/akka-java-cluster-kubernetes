@@ -1,0 +1,84 @@
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'application'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+file("${rootDir}/CHANGELOG.md").eachLine { line ->
+    def matcher = line =~ /##.*\[(\d+\.\d+\.\d+)\].*/
+
+    if (matcher.matches() && version == "unspecified") {
+        version = matcher[0][1]
+    }
+}
+
+group = 'cluster.sharding'
+
+tasks.withType(JavaCompile) {
+    options*.encoding = 'UTF-8'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    runAgent
+}
+
+ext {
+    scalaVersion = '2.12'
+    akkaVersion = '2.5.23'
+    akkaHttpVersion = '10.1.8'
+    akkaManagementVersion = '1.0.3'
+
+    jacksonVersion = '2.9.9'
+    junitVersion = '4.12'
+}
+
+dependencies {
+
+    compile "com.lightbend.akka.management:akka-management_$scalaVersion:$akkaManagementVersion"
+    compile "com.lightbend.akka.management:akka-management-cluster-bootstrap_$scalaVersion:$akkaManagementVersion"
+    compile "com.lightbend.akka.discovery:akka-discovery-kubernetes-api_$scalaVersion:$akkaManagementVersion"
+    compile "com.lightbend.akka.management:akka-management-cluster-http_$scalaVersion:$akkaManagementVersion"
+
+    compile "com.typesafe.akka:akka-actor_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-cluster_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-cluster-sharding_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-cluster-metrics_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-slf4j_$scalaVersion:$akkaVersion"
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+    compile "com.typesafe.akka:akka-http_$scalaVersion:$akkaHttpVersion"
+    compile "com.typesafe.akka:akka-http-spray-json_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-stream_$scalaVersion:$akkaVersion"
+
+
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+
+    testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:$akkaVersion"
+    testCompile "com.typesafe.akka:akka-http-testkit_$scalaVersion:$akkaHttpVersion"
+    testCompile "junit:junit:$junitVersion"
+
+}
+
+test {
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = 'full'
+    jvmArgs "-Dconfig.file=src/test/resources/application.conf"
+}
+
+tasks.withType(CreateStartScripts) {
+    def script = 'scripts/UnixStartScript.txt'
+    assert project.file(script).exists()
+    unixStartScriptGenerator.template = resources.text.fromFile(script)
+    mainClassName = "cluster.sharding.Runner"
+}
